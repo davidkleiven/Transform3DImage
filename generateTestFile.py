@@ -21,7 +21,7 @@ def main():
 
     res = 200
     # Save in raw binary format
-    fname = "exampleFile_%d_%d_%d_%d.raw"%(res,len(x),len(y),len(z))
+    fname = "exampleFile_%d_%d_%d_%d.raw"%(res,values.shape[0],values.shape[1],values.shape[2])
     values.tofile( fname )
 
     print ("Example file written to %s"%(fname))

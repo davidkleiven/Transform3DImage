@@ -24,6 +24,9 @@ class Image3D:
         self.ax3D = self.fig.add_subplot(2,2,4, projection="3d")
         self.cmap = "bone"
         self.origColor = None
+        self.render3D = True
+        self.prefix = ""
+        self.resolution = 0
 
     def checkState( self ):
         if ( self.pixels is None ):
@@ -70,8 +73,15 @@ class Image3D:
 
     def updatePlots( self ):
         self.showProjections()
-        self.create3Dsurface()
+        if ( self.render3D ):
+            self.create3Dsurface()
         plt.show( block=False )
+
+    def save( self ):
+        outfname = self.prefix+"_%d_%d_%d_%d.raw"%(self.resolution, self.pixels.shape[0], self.pixels.shape[1], self.pixels.shape[2])
+        self.pixels.tofile( outfname )
+        print ("The new transformed array is written to %s"%(outfname))
+
 
 class ControlInterface:
     def __init__( self, master ):
@@ -79,13 +89,21 @@ class ControlInterface:
         self.img = Image3D()
 
         self.rotXLab = tk.Label( self.root, text="RotX")
-        self.rotX = tk.Entry( self.root, width=60 )
+        self.rotX = tk.Entry( self.root, width=20 )
+        self.rotX.insert(0, 0.0)
         self.rotYLab = tk.Label( self.root, text="RotY")
-        self.rotY = tk.Entry( self.root, width=60)
+        self.rotY = tk.Entry( self.root, width=20)
+        self.rotY.insert(0, 0.0)
         self.rotZLab = tk.Label( self.root, text="RotZ")
-        self.rotZ = tk.Entry( self.root, width=60)
+        self.rotZ = tk.Entry( self.root, width=20)
+        self.rotZ.insert(0,0.0)
 
         self.updateButton = tk.Button( self.root, text="Update", command=self.update )
+        self.renderButtonValue = tk.IntVar()
+        self.render3Dbutton = tk.Checkbutton( self.root, text="Render 3D", variable=self.renderButtonValue )
+        self.render3Dbutton.select()
+
+        self.saveButton = tk.Button( self.root, text="Save", command=self.save)
 
         self.grid()
 
@@ -98,7 +116,9 @@ class ControlInterface:
         self.rotY.grid(row=1,column=1)
         self.rotZLab.grid(row=2,column=0)
         self.rotZ.grid(row=2,column=1)
+        self.render3Dbutton.grid(row=3,column=0)
         self.updateButton.grid(row=3,column=1)
+        self.saveButton.grid(row=3,column=2)
 
     def update( self ):
         if ( not self.imgIsCentered ):
@@ -107,6 +127,11 @@ class ControlInterface:
         rotX = float( self.rotX.get() )
         rotY = float( self.rotY.get() )
         rotZ = float( self.rotZ.get() )
+
+        if ( int(self.renderButtonValue.get()) == 1 ):
+            self.img.render3D = True
+        else:
+            self.img.render3D = False
 
         ZERO_ANGLE = 0.0001
         if ( np.abs(rotX) > ZERO_ANGLE ):
@@ -117,3 +142,6 @@ class ControlInterface:
             self.img.rotateZ( rotZ )
 
         self.img.updatePlots()
+
+    def save( self ):
+        self.img.save()

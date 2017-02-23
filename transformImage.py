@@ -8,10 +8,11 @@ def extractDimensions( fname ):
     if ( len(splitFname) != 5 ):
         msg = "Unexpected format of the filename. Should be prefix_resolution_Nx_Ny_Nz.raw"
         raise( Exception(msg) )
+    res = int( splitFname[1] )
     Nx = int( splitFname[2] )
     Ny = int( splitFname[3] )
     Nz = int( splitFname[4].split(".")[0] )
-    return Nx, Ny, Nz
+    return res, Nx, Ny, Nz
 
 def main( argv ):
     if ( len(argv) != 1 ):
@@ -22,15 +23,17 @@ def main( argv ):
         root = tk.Tk()
         root.wm_title("3D Image Transformer")
         ci = tf3.ControlInterface( root )
-        Nx, Ny, Nz = extractDimensions( fname )
+        res, Nx, Ny, Nz = extractDimensions( fname )
         ci.img.pixels = np.fromfile(fname, dtype=np.uint8)
+        ci.img.prefix = fname.split("_")[0]+"Rotated"
+        ci.img.resolution = res
         print (ci.img.pixels)
 
         if ( len(ci.img.pixels) != Nx*Ny*Nz ):
             print ("Expected length: %d. Length of array from file %d"%(Nx*Ny*Nz, len(ci.img.pixels)))
             return 1
 
-        ci.img.pixels = ci.img.pixels.reshape((Ny,Nx,Nz))
+        ci.img.pixels = ci.img.pixels.reshape((Nx,Ny,Nz))
 
         root.mainloop()
     except Exception as exc:
