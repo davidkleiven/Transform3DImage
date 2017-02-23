@@ -18,6 +18,7 @@ To launch the program type
 python3 transformImage.py someFile_200_101_150_250.raw
 ```
 Here the numbers indicates:
+
 1. Voxel size
 2. Number of voxels in the x-direction
 3. Number of voxels in the y-direction
