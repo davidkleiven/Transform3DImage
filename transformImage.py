@@ -15,10 +15,14 @@ def extractDimensions( fname ):
     return res, Nx, Ny, Nz
 
 def main( argv ):
-    if ( len(argv) != 1 ):
-        print ( "Usage: python3 transformImage.py rawBinaryFile.raw" )
+    if ( len(argv) < 1 ) or ( len(argv) > 2 ):
+        print ( "Usage: python3 transformImage.py rawBinaryFile.raw --order=(C,F)" )
         return
     fname = argv[0]
+    order = "C"
+    for arg in argv:
+        if ( arg.find("--order=") != -1 ):
+            order = arg.split("--order=")[1]
     try:
         root = tk.Tk()
         root.wm_title("3D Image Transformer")
@@ -33,7 +37,7 @@ def main( argv ):
             print ("Expected length: %d. Length of array from file %d"%(Nx*Ny*Nz, len(ci.img.pixels)))
             return 1
 
-        ci.img.pixels = ci.img.pixels.reshape((Nx,Ny,Nz))
+        ci.img.pixels = ci.img.pixels.reshape((Nx,Ny,Nz), order=order)
 
         root.mainloop()
     except Exception as exc:
