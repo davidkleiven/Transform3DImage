@@ -80,9 +80,7 @@ class Image3D:
 
     def save( self ):
         outfname = self.prefix+"_%d_%d_%d_%d.raw"%(self.resolution, self.pixels.shape[0], self.pixels.shape[1], self.pixels.shape[2])
-        if ( self.order == "F" ):
-            self.pixels = np.asfortranarray( self.pixels )
-        self.pixels.tofile( outfname )
+        self.pixels.ravel(order=self.order).tofile( outfname )
         print ("The new transformed array is written to %s"%(outfname))
 
 
