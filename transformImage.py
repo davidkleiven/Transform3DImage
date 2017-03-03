@@ -31,7 +31,7 @@ def main( argv ):
         ci.img.pixels = np.fromfile(fname, dtype=np.uint8)
         ci.img.prefix = fname.split("_")[0]+"Rotated"
         ci.img.resolution = res
-        print (ci.img.pixels)
+        ci.img.order = order
 
         if ( len(ci.img.pixels) != Nx*Ny*Nz ):
             print ("Expected length: %d. Length of array from file %d"%(Nx*Ny*Nz, len(ci.img.pixels)))

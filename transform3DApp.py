@@ -27,6 +27,7 @@ class Image3D:
         self.render3D = True
         self.prefix = ""
         self.resolution = 0
+        self.order = "C"
 
     def checkState( self ):
         if ( self.pixels is None ):
@@ -79,6 +80,8 @@ class Image3D:
 
     def save( self ):
         outfname = self.prefix+"_%d_%d_%d_%d.raw"%(self.resolution, self.pixels.shape[0], self.pixels.shape[1], self.pixels.shape[2])
+        if ( self.order == "F" ):
+            self.pixels = np.asfortranarray( self.pixels )
         self.pixels.tofile( outfname )
         print ("The new transformed array is written to %s"%(outfname))
 
