@@ -9,6 +9,7 @@ from scipy import ndimage
 import tkinter as tk
 from skimage import measure as skmeasure
 from mpl_toolkits.mplot3d import Axes3D
+import h5py as h5
 
 class Image3D:
     def __init__(self):
@@ -78,10 +79,15 @@ class Image3D:
             self.create3Dsurface()
         plt.show( block=False )
 
-    def save( self ):
+    def save( self, hdf5=False ):
         outfname = self.prefix+"_%d_%d_%d_%d.raw"%(self.resolution, self.pixels.shape[0], self.pixels.shape[1], self.pixels.shape[2])
         self.pixels.ravel(order=self.order).tofile( outfname )
         print ("The new transformed array is written to %s"%(outfname))
+
+        if ( hdf5 ):
+            outfname = self.prefix+"_%d_%d_%d_%d.h5"%(self.resolution, self.pixels.shape[0], self.pixels.shape[1], self.pixels.shape[2])
+            with h5.File( outfname, 'w' ) as hf:
+                hf.create_dataset( "voxels", data=self.pixels )
 
 
 class ControlInterface:
@@ -98,6 +104,11 @@ class ControlInterface:
         self.rotZLab = tk.Label( self.root, text="RotZ")
         self.rotZ = tk.Entry( self.root, width=20)
         self.rotZ.insert(0,0.0)
+        self.rotP90XB = tk.Button( self.root, text="+90", command=self.rotP90X )
+        self.rotM90XB = tk.Button( self.root, text="FlipX", command=self.flipX )
+        self.rotP90YB = tk.Button( self.root, text="+90", command=self.rotP90Y )
+        self.rotM90YB = tk.Button( self.root, text="FlipY", command=self.flipY )
+        self.rotP90ZB = tk.Button( self.root, text="+90", command=self.rotP90Z )
 
         self.updateButton = tk.Button( self.root, text="Update", command=self.update )
         self.renderButtonValue = tk.IntVar()
@@ -117,6 +128,11 @@ class ControlInterface:
         self.rotY.grid(row=1,column=1)
         self.rotZLab.grid(row=2,column=0)
         self.rotZ.grid(row=2,column=1)
+        self.rotP90XB.grid(row=0,column=2)
+        self.rotM90XB.grid(row=0,column=3)
+        self.rotP90YB.grid(row=1,column=2)
+        self.rotM90YB.grid(row=1,column=3)
+        self.rotP90ZB.grid(row=2,column=2)
         self.render3Dbutton.grid(row=3,column=0)
         self.updateButton.grid(row=3,column=1)
         self.saveButton.grid(row=3,column=2)
@@ -144,5 +160,22 @@ class ControlInterface:
 
         self.img.updatePlots()
 
+    def rotP90X( self ):
+        #self.img.pixels = np.rot90( self.img.pixels, axes=(0,1) )
+        self.img.pixels = self.img.pixels.transpose((0,2,1))
+    def flipX( self ):
+        #self.img.pixels = np.rot90( self.img.pixels, k=3, axes=(0,1) )
+        self.img.pixels = np.flipud( self.img.pixels )
+        #self.img.pixels = self.img.pixels.transpose((0,2,1))
+    def rotP90Y( self ):
+        #self.img.pixels = np.rot90( self.img.pixels, axes=(0,2) )
+        self.img.pixels = self.img.pixels.transpose((2,1,0))
+
+    def rotP90Z( self ):
+        #self.img.pixels = np.rot90( self.img.pixels, axes=(0,2) )
+        self.img.pixels = self.img.pixels.transpose((1,0,2))
+    def flipY( self ):
+        #self.img.pixels = np.rot90( self.img.pixels, k=3, axes=(0,2) )
+        self.img.pixels = self.img.pixels.transpose((2,1,0))
     def save( self ):
-        self.img.save()
+        self.img.save( hdf5=True )

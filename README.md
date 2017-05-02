@@ -11,6 +11,7 @@ In order to run the program the following packages are required:
 * tkinter
 * scikit-image
 * scipy
+* h5py
 
 # Usage
 To launch the program type
