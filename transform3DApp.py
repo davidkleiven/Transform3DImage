@@ -88,6 +88,7 @@ class Image3D:
             outfname = self.prefix+"_%d_%d_%d_%d.h5"%(self.resolution, self.pixels.shape[0], self.pixels.shape[1], self.pixels.shape[2])
             with h5.File( outfname, 'w' ) as hf:
                 hf.create_dataset( "voxels", data=self.pixels )
+            print ("HDF5 file saved to %s"%(outfname))
 
 
 class ControlInterface:
